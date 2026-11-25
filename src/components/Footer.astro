@@ -1,0 +1,12 @@
+---
+import { SITE } from '../site.config';
+import { url } from '../lib/posts';
+---
+
+<footer class="site-footer">
+  <span>© {new Date().getFullYear()} {SITE.author}</span>
+  <a href={url('rss.xml')}>RSS 订阅</a>
+  <span>用 <a href="https://astro.build">Astro</a> 搭建</span>
+  {SITE.heroCredit && <span>{SITE.heroCredit}</span>}
+  {SITE.artNotice && <span>{SITE.artNotice}</span>}
+</footer>

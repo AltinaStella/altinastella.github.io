@@ -1,0 +1,92 @@
+---
+import 'katex/dist/katex.min.css';
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { formatDate, getPosts, postUrl, readingMinutes, tagUrl, type Post } from '../../lib/posts';
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  // posts 是新的在前：older 是上一篇（更早），newer 是下一篇（更新）
+  return posts.map((post, i) => ({
+    params: { slug: post.id },
+    props: { post, newer: posts[i - 1], older: posts[i + 1] },
+  }));
+}
+
+interface Props {
+  post: Post;
+  newer?: Post;
+  older?: Post;
+}
+
+const { post, newer, older } = Astro.props;
+const { Content, headings } = await render(post);
+const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
+const { title, description, pubDate, updatedDate, tags, cover } = post.data;
+---
+
+<Base title={title} description={description} banner={cover}>
+  <article class="post">
+    <header class="wrap post-head">
+      {
+        tags.length > 0 && (
+          <ul class="tags">
+            {tags.map((tag) => (
+              <li>
+                <a href={tagUrl(tag)}>#{tag}</a>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+      <h1 class="post-title">{title}</h1>
+      {description && <p class="post-desc">{description}</p>}
+      <p class="post-meta">
+        <time datetime={pubDate.toISOString()}>{formatDate(pubDate)}</time>
+        {updatedDate && <span>更新于 {formatDate(updatedDate)}</span>}
+        <span>约 {readingMinutes(post.body)} 分钟读完</span>
+      </p>
+    </header>
+
+    <div class="post-layout">
+      <div class="prose">
+        <Content />
+      </div>
+      {
+        toc.length >= 3 && (
+          <nav class="toc" aria-label="目录">
+            <p class="toc-title">目录</p>
+            <ol>
+              {toc.map((h) => (
+                <li class={`toc-depth-${h.depth}`}>
+                  <a href={`#${h.slug}`}>{h.text}</a>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        )
+      }
+    </div>
+
+    {
+      (newer || older) && (
+        <nav class="wrap post-nav" aria-label="更多文章">
+          {older ? (
+            <a class="post-nav-older" href={postUrl(older)}>
+              <span>上一篇</span>
+              {older.data.title}
+            </a>
+          ) : (
+            <span />
+          )}
+          {newer && (
+            <a class="post-nav-newer" href={postUrl(newer)}>
+              <span>下一篇</span>
+              {newer.data.title}
+            </a>
+          )}
+        </nav>
+      )
+    }
+  </article>
+</Base>

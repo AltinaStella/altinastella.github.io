@@ -1,0 +1,38 @@
+---
+import { formatDate, formatMonthDay, postUrl, tagUrl, type Post } from '../lib/posts';
+
+interface Props {
+  posts: Post[];
+  /** 在按年份分组的列表里只显示月日 */
+  shortDate?: boolean;
+}
+const { posts, shortDate = false } = Astro.props;
+---
+
+<ol class="post-list">
+  {
+    posts.map((post) => (
+      <li class="post-item">
+        <time datetime={post.data.pubDate.toISOString()}>
+          {shortDate ? formatMonthDay(post.data.pubDate) : formatDate(post.data.pubDate)}
+        </time>
+        <div>
+          <h3 class="post-item-title">
+            <a href={postUrl(post)}>{post.data.title}</a>
+            {post.data.draft && <span class="draft-badge">草稿</span>}
+          </h3>
+          {post.data.description && <p class="post-item-desc">{post.data.description}</p>}
+          {post.data.tags.length > 0 && (
+            <ul class="tags">
+              {post.data.tags.map((tag) => (
+                <li>
+                  <a href={tagUrl(tag)}>#{tag}</a>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </li>
+    ))
+  }
+</ol>

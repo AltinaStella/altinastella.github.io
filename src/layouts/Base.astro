@@ -1,0 +1,92 @@
+---
+import '@fontsource/noto-serif-sc/600.css';
+import '@fontsource/cormorant-garamond/latin-600-italic.css';
+import '../styles/global.css';
+import { getImage, Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import hero from '../assets/hero-oc.jpg';
+import { SITE } from '../site.config';
+import { url } from '../lib/posts';
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** 页面顶部横幅用的图，默认是首页头图的一角 */
+  banner?: ImageMetadata;
+  /** 首页用完整的大头图 */
+  fullHero?: boolean;
+}
+
+const { title, description = SITE.description, banner = hero, fullHero = false } = Astro.props;
+const pageTitle = title ? `${title} | ${SITE.title}` : SITE.title;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImage = await getImage({ src: banner, width: 1200, format: 'jpg' });
+---
+
+<!doctype html>
+<html lang={SITE.lang} data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href={url('favicon.svg')} type="image/svg+xml" />
+    <link rel="alternate" type="application/rss+xml" title={SITE.title} href={url('rss.xml')} />
+    <link rel="sitemap" href={url('sitemap-index.xml')} />
+    <meta name="theme-color" content="#15122a" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE.title} />
+    <meta property="og:title" content={title ?? SITE.title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={new URL(ogImage.src, Astro.site)} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script is:inline>
+      // 在页面绘制前应用主题，避免闪一下
+      document.documentElement.dataset.theme = localStorage.getItem('theme') === 'light' ? 'light' : 'dark';
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">跳到正文</a>
+    <Header />
+    {
+      fullHero ? (
+        <section class="hero">
+          <Image
+            class="hero-img"
+            src={hero}
+            alt="Altina 的原创角色：银发少女坐在夜晚窗边的紫色沙发上读书，窗外是新月和星空，身边飞着发光的蝴蝶。"
+            widths={[640, 960, 1280, 1600]}
+            sizes="100vw"
+            loading="eager"
+            fetchpriority="high"
+            draggable="false"
+          />
+          <div class="hero-text">
+            <h1 class="wordmark">{SITE.title}</h1>
+            <p class="tagline">{SITE.tagline}</p>
+          </div>
+        </section>
+      ) : (
+        <div class="banner">
+          <Image
+            class="banner-img"
+            src={banner}
+            alt=""
+            widths={[800, 1600]}
+            sizes="100vw"
+            loading="eager"
+            draggable="false"
+          />
+        </div>
+      )
+    }
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

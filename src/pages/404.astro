@@ -1,0 +1,15 @@
+---
+import Base from '../layouts/Base.astro';
+import { url } from '../lib/posts';
+---
+
+<Base title="找不到页面">
+  <div class="wrap">
+    <h1 class="page-title">找不到这个页面</h1>
+    <p class="page-lede">可能是链接写错了，或者文章换了地址。</p>
+    <p class="not-found-links">
+      <a href={url()}>回到首页</a>
+      <a href={url('blog/')}>查看全部文章</a>
+    </p>
+  </div>
+</Base>

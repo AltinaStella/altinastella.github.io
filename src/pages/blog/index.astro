@@ -1,0 +1,23 @@
+---
+import Base from '../../layouts/Base.astro';
+import PostList from '../../components/PostList.astro';
+import { getPosts } from '../../lib/posts';
+
+const posts = await getPosts();
+const years = Map.groupBy(posts, (post) => post.data.pubDate.getUTCFullYear());
+---
+
+<Base title="文章" description="全部文章，按时间排列。">
+  <div class="wrap">
+    <h1 class="page-title">文章</h1>
+    <p class="page-lede">共 {posts.length} 篇，按时间排列。</p>
+    {
+      [...years].map(([year, yearPosts]) => (
+        <section class="year-group" aria-labelledby={`y${year}`}>
+          <h2 id={`y${year}`} class="year">{year}</h2>
+          <PostList posts={yearPosts} shortDate />
+        </section>
+      ))
+    }
+  </div>
+</Base>

@@ -1,0 +1,44 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Social from '../components/Social.astro';
+import avatar from '../assets/avatar.jpg';
+import { PROJECTS } from '../data/projects';
+import { Content as AboutText } from '../about.md';
+---
+
+<Base title="关于" description="关于 Altina。">
+  <div class="wrap">
+    <header class="about-head">
+      <Image class="avatar avatar--large" src={avatar} alt="Altina 的头像" width={192} height={192} />
+      <div>
+        <h1 class="page-title">Altina</h1>
+        <p class="about-alias">也叫 Yi Lin</p>
+      </div>
+    </header>
+
+    <div class="prose">
+      <AboutText />
+    </div>
+
+    <h2 class="section-title">在别处找到我</h2>
+    <Social labels />
+
+    <h2 class="section-title">项目</h2>
+    <ul class="projects">
+      {
+        PROJECTS.map((project) => (
+          <li>
+            <h3>
+              <a href={`https://github.com/${project.repo}`} target="_blank" rel="noopener">
+                {project.name}
+              </a>
+            </h3>
+            <p class="project-stack">{project.stack}</p>
+            <p>{project.summary}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</Base>

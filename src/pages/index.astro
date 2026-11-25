@@ -1,0 +1,30 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import PostList from '../components/PostList.astro';
+import Social from '../components/Social.astro';
+import avatar from '../assets/avatar.jpg';
+import { getPosts, url } from '../lib/posts';
+import { SITE } from '../site.config';
+
+const posts = await getPosts();
+const recent = posts.slice(0, 6);
+---
+
+<Base fullHero>
+  <div class="wrap">
+    <section class="intro">
+      <Image class="avatar" src={avatar} alt="Altina 的头像" width={144} height={144} />
+      <div>
+        {SITE.intro && <p>{SITE.intro}</p>}
+        <Social />
+      </div>
+    </section>
+
+    <section aria-labelledby="recent-title">
+      <h2 id="recent-title" class="section-title">最近的文章</h2>
+      {recent.length > 0 ? <PostList posts={recent} /> : <p class="empty">还没有文章。</p>}
+      {posts.length > recent.length && <a class="more-link" href={url('blog/')}>查看全部 {posts.length} 篇文章</a>}
+    </section>
+  </div>
+</Base>

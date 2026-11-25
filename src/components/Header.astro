@@ -1,0 +1,49 @@
+---
+import { SITE } from '../site.config';
+import { url } from '../lib/posts';
+
+const links = [
+  { href: url('blog/'), label: '文章' },
+  { href: url('tags/'), label: '标签' },
+  { href: url('about/'), label: '关于' },
+];
+const path = Astro.url.pathname;
+---
+
+<header class="site-header">
+  <a class="brand" href={url()}>
+    <svg class="sparkle" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 0c.6 6.5 5.5 11.4 12 12-6.5.6-11.4 5.5-12 12-.6-6.5-5.5-11.4-12-12 6.5-.6 11.4-5.5 12-12z" />
+    </svg>
+    {SITE.author}
+  </a>
+  <nav aria-label="主导航">
+    {
+      links.map(({ href, label }) => (
+        <a href={href} aria-current={path.startsWith(href) ? 'page' : undefined}>
+          {label}
+        </a>
+      ))
+    }
+  </nav>
+  <button class="theme-toggle" type="button" aria-label="切换浅色 / 深色">
+    <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="4.5" />
+      <path
+        d="M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3M4.6 4.6l2.1 2.1M17.3 17.3l2.1 2.1M4.6 19.4l2.1-2.1M17.3 6.7l2.1-2.1"
+      />
+    </svg>
+    <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7z" />
+    </svg>
+  </button>
+</header>
+
+<script>
+  const button = document.querySelector<HTMLButtonElement>('.theme-toggle');
+  button?.addEventListener('click', () => {
+    const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+    document.documentElement.dataset.theme = next;
+    localStorage.setItem('theme', next);
+  });
+</script>
